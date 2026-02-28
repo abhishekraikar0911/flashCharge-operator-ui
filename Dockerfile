@@ -1,4 +1,4 @@
-FROM node:24-alpine AS base
+FROM node:20-alpine AS base
 
 FROM base AS deps
 
@@ -9,9 +9,10 @@ WORKDIR /app
 COPY package.json package-lock.json* .npmrc* ./
 
 RUN \
-  if [ -f package-lock.json ]; then npm ci; \
+  if [ -f package-lock.json ]; then npm ci --prefer-offline --no-audit --no-fund; \
   else echo "Lockfile not found." && exit 1; \
   fi
+
 
 FROM base AS builder
 
@@ -21,7 +22,9 @@ COPY --from=deps /app/node_modules ./node_modules
 
 COPY . .
 
-RUN npm run build
+ENV NODE_OPTIONS="--max-old-space-size=1536"
+
+RUN npm run build 
 
 FROM base AS runner
 

@@ -1,11 +1,18 @@
-# SPDX-FileCopyrightText: 2025 Contributors to the CitrineOS Project
-#
-# SPDX-License-Identifier: Apache-2.0
-
 services:
   citrine-ui:
     build:
       context: .
       dockerfile: ./Dockerfile
+    container_name: csms-operator-ui
+    env_file:
+      - .env.local
     ports:
-      - 3000:3000
+      - "3000:3000"
+    networks:
+      - citrine_v2_network
+
+networks:
+  citrine_v2_network:
+    external: true
+    name: citrine_v2_default
+

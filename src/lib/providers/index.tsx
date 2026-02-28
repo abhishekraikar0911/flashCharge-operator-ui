@@ -12,6 +12,7 @@ import liveProvider from '@lib/providers/live-provider';
 import { notificationProvider } from '@lib/providers/notification-provider';
 import ReduxProvider from '@lib/providers/redux-provider';
 import { setUserLocale } from '@lib/server/hooks/getUserLocale';
+import config from '@lib/utils/config';
 import { resources } from '@lib/utils/resources';
 import type { I18nProvider } from '@refinedev/core';
 import { Refine } from '@refinedev/core';
@@ -64,7 +65,9 @@ export function Providers({
 
   if (!mounted) return null;
 
-  return (
+  const authProviderType = process.env.NEXT_PUBLIC_AUTH_PROVIDER || 'generic';
+
+  return authProviderType === 'keycloak' ? (
     <SessionProvider>
       <ReduxProvider>
         <QueryClientProvider client={queryClient}>
@@ -105,5 +108,44 @@ export function Providers({
         </QueryClientProvider>
       </ReduxProvider>
     </SessionProvider>
+  ) : (
+    <ReduxProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme={defaultMode}
+          enableSystem={false}
+          storageKey="theme"
+          disableTransitionOnChange
+        >
+          <Toaster />
+          {/* <DevtoolsProvider>
+              <Suspense fallback={<div>Loading...</div>}> */}
+          <Refine
+            routerProvider={routerProvider}
+            dataProvider={dataProvider}
+            liveProvider={liveProvider}
+            notificationProvider={notificationProvider}
+            authProvider={authProvider}
+            accessControlProvider={accessControlProvider}
+            i18nProvider={i18nProvider}
+            resources={resources}
+            options={{
+              syncWithLocation: true,
+              warnWhenUnsavedChanges: true,
+              projectId: '6ZV3T4-Lyy7B3-Dr5Uhd',
+              liveMode: 'auto',
+              reactQuery: {
+                clientConfig: queryClient,
+              },
+            }}
+          >
+            {children}
+          </Refine>
+          {/* </Suspense>
+            </DevtoolsProvider> */}
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ReduxProvider>
   );
 }
