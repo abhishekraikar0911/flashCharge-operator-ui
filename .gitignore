@@ -42,3 +42,7 @@ next-env.d.ts
 .env*
 *.save
 node_modules/
+.env*
+*.log
+node_modules/
+*.pid
